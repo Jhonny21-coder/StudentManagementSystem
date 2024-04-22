@@ -1,6 +1,11 @@
 package com.example.application.views;
 
-import java.util.List;
+/*
+  This class is the layout or view of the Add Attendance feature.
+  This class is responsible for adding student's attendance.
+*/
+
+import com.example.application.services.StudentService;
 import com.example.application.services.AttendanceService;
 import com.example.application.data.Attendance;
 import com.example.application.data.Student;
@@ -21,7 +26,9 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.*;
+import com.vaadin.flow.router.PageTitle;
 
+import java.util.List;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ArrayList;
@@ -29,112 +36,125 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
-@Route("addAttendance")
+// Route and title
+@Route("addAttendance") // Route for accessing the view
+@PageTitle("AddAttendance | SMS") // Title of the page
 public class AddAttendanceView extends AppLayout {
-    private final StudentService service;
-    private final AttendanceService attendanceService;
 
-    public AddAttendanceView(StudentService service, AttendanceService attendanceService) {
-        this.attendanceService = attendanceService;
+    // Services for managing students and attendance
+    private final StudentService studentService; // Service for managing students
+    private final AttendanceService attendanceService; // Service for managing attendance
 
-	Span date = new Span("[ " + String.valueOf(LocalDate.now()) + " ]");
-	date.addClassName("date");
-        Span header = new Span("Attendance ");
-	header.addClassName("add-header");
+    // Constructor
+    public AddAttendanceView(StudentService studentService, AttendanceService attendanceService) {
+        this.attendanceService = attendanceService; // Initialize attendance service
+        this.studentService = studentService; // Initialize student service
 
-        addClassName("nav");
+        // Header components
+        Span date = new Span("[ " + String.valueOf(LocalDate.now()) + " ]"); // Span for displaying the current date
+        date.addClassName("date"); // Add CSS class to the date span
+        Span header = new Span("Attendance "); // Span for the header
+        header.addClassName("add-header"); // Add CSS class to the header span
 
-        this.service = service;
+        addClassName("nav"); // Add CSS class to the layout
 
-	List<Student> students = StudentService.getAllStudents();
-	List<Long> idList = new ArrayList<>();
+        // Get all students and initialize a list to store absent student IDs
+        List<Student> students = studentService.getAllStudents(); // Get all students
+        List<Long> idList = new ArrayList<>(); // List to store absent student IDs
 
-	Button closeButton = new Button("Close", new Icon(VaadinIcon.CLOSE), event -> getUI().ifPresent(ui -> ui.navigate(AttendanceViews.class)));
-      	closeButton.addClassName("close-button");
+        // Buttons for closing and saving attendance
+        Button closeButton = new Button("Close", new Icon(VaadinIcon.CLOSE), event -> getUI().ifPresent(ui -> ui.navigate(AttendanceView.class))); // Close button
+        closeButton.addClassName("close-button"); // Add CSS class to the close button
 
-        Button saveButton = new Button("Save", new Icon(VaadinIcon.CHECK));
-        saveButton.addClassName("save-button");
+        Button saveButton = new Button("Save", new Icon(VaadinIcon.CHECK)); // Save button
+        saveButton.addClassName("save-button"); // Add CSS class to the save button
         saveButton.addClickListener(event -> {
-             for(Student student : students){
-		 if(student.getStatus() == false){
-		    idList.add(student.getId());
-		    student.setAbsent(student.getAbsent() + 1);
-		    service.saveStudent(student);
-		  }
-	     }
+            // Iterate through students list
+            for (Student student : students) {
+                if (!student.getStatus()) { // Check if student is absent
+                    idList.add(student.getId()); // Add absent student ID to the list
+                    student.setAbsent(student.getAbsent() + 1); // Increment absent count
+                    studentService.saveStudent(student); // Save student
+                }
+            }
 
-	     ZoneId zoneId = ZoneId.of("America/New_York");
+            ZoneId zoneId = ZoneId.of("America/New_York"); // Set time zone
 
-             // Get the current time in the specified time zone
-             LocalTime localTime = LocalTime.now(zoneId);
+            // Get the current time in the specified time zone
+            LocalTime localTime = LocalTime.now(zoneId);
 
-	     Attendance attendance = new Attendance();
-	     attendance.setAttendanceDate(LocalDate.now());
-	     attendance.setAttendanceTime(localTime);
-	     attendance.setAbsentStudentIds(idList);
-	     attendanceService.saveAttendance(attendance);
-             getUI().ifPresent(ui -> ui.navigate(AttendanceViews.class));
+            Attendance attendance = new Attendance(); // Create new attendance object
+            attendance.setAttendanceDate(LocalDate.now()); // Set attendance date
+            attendance.setAttendanceTime(localTime); // Set attendance time
+            attendance.setAbsentStudentIds(idList); // Set absent student IDs
+            attendanceService.saveAttendance(attendance); // Save attendance
+            getUI().ifPresent(ui -> ui.navigate(AttendanceView.class)); // Navigate back to attendance view
         });
 
-	HorizontalLayout headerLayout = new HorizontalLayout(
-		header, date, saveButton, closeButton);
-        headerLayout.setSpacing(true);
+        // Horizontal layout for header components
+        HorizontalLayout headerLayout = new HorizontalLayout(
+                header, date, saveButton, closeButton); // Header components
+        headerLayout.setSpacing(true); // Set spacing between components
 
-        addToNavbar(headerLayout);
+        addToNavbar(headerLayout); // Add header layout to the navigation bar
 
-        Grid<Student> grid = new Grid<>(Student.class, false);
-        grid.setSizeFull();
-	grid.addClassName("grid");
+        // Grid component for displaying students
+        Grid<Student> grid = new Grid<>(Student.class, false); // Create grid with Student class as data type
+        grid.setSizeFull(); // Set grid size to full
+        grid.addClassName("grid"); // Add CSS class to the grid
 
-	grid.addComponentColumn(student -> {
-            Span indexSpan = new Span();
-            int index = students.indexOf(student) + 1;
-
-            indexSpan.setText(String.valueOf(index) + ".");
-
-            return indexSpan;
-        }).setHeader("No.");
-
+        // Column for numbering
         grid.addComponentColumn(student -> {
-            Checkbox checkbox = new Checkbox();
+            Span indexSpan = new Span(); // Span for displaying index
+            int index = students.indexOf(student) + 1; // Calculate index
 
-            checkbox.setValue(student.getStatus());
+            indexSpan.setText(String.valueOf(index) + "."); // Set index text
+
+            return indexSpan; // Return index span
+        }).setHeader("No."); // Set header for the column
+
+        // Column for marking attendance
+        grid.addComponentColumn(student -> {
+            Checkbox checkbox = new Checkbox(); // Checkbox for marking attendance
+
+            checkbox.setValue(student.getStatus()); // Set checkbox value
             checkbox.addValueChangeListener(event -> {
-                boolean newStatus = event.getValue();
+                boolean newStatus = event.getValue(); // Get new status from checkbox value change
 
-                student.setStatus(newStatus);
-                service.saveStudent(student);
+                student.setStatus(newStatus); // Update student status
+                studentService.saveStudent(student); // Save student
 
                 // Update the badge color live
-                grid.getDataProvider().refreshItem(student);
+                grid.getDataProvider().refreshItem(student); // Refresh grid
             });
-            return checkbox;
-        }).setHeader("Mark as Present");
+            return checkbox; // Return checkbox
+        }).setHeader("Mark as Present"); // Set header for the column
 
-        grid.addColumn(Student::getId).setHeader("ID")
-                .setAutoWidth(true).setFlexGrow(0);
-        grid.addColumn(Student::getFullName).setHeader("Full Name")
-                .setAutoWidth(true);
-        grid.addColumn(createStatusComponentRenderer()).setHeader("Is Present?")
-                .setAutoWidth(true);
+        // Other columns
+        grid.addColumn(Student::getId).setHeader("ID").setAutoWidth(true); // ID column
+        grid.addColumn(Student::getFullName).setHeader("Full Name").setAutoWidth(true); // Full name column
+        grid.addColumn(createStatusComponentRenderer()).setHeader("Is Present?"); // Is present column
 
-        Collections.sort(students, Comparator.comparing(Student::getFirstName));
+        // Sort the list by students' last name
+        Collections.sort(students, Comparator.comparing(Student::getLastName)); // Sort students by last name
 
-        grid.setItems(students);
+        grid.setItems(students); // Set student data to grid
 
-        setContent(grid);
+        setContent(grid); // Set grid as main content of the layout
     }
 
+    // Method for creating status component renderer
     private static final SerializableBiConsumer<Span, Student> statusComponentUpdater = (
             span, student) -> {
-        boolean isAvailable = student.getStatus() == true;
-        String theme = String.format("badge %s", isAvailable ? "success" : "error");
-        span.getElement().setAttribute("theme", theme);
+        boolean isAvailable = student.getStatus(); // Get student status
+        String theme = String.format("badge %s", isAvailable ? "success" : "error"); // Determine badge theme based on status
+        span.getElement().setAttribute("theme", theme); // Set theme attribute for span element
 
-        span.setText(String.valueOf(student.getStatus()));
+        span.setText(String.valueOf(student.getStatus())); // Set text for span element
     };
 
+    // Method for creating status component renderer
     private static ComponentRenderer<Span, Student> createStatusComponentRenderer() {
-        return new ComponentRenderer<>(Span::new, statusComponentUpdater);
+        return new ComponentRenderer<>(Span::new, statusComponentUpdater); // Create component renderer
     }
 }

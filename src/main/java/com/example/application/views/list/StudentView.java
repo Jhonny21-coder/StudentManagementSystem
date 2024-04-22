@@ -16,113 +16,146 @@ import com.vaadin.flow.component.icon.*;
 
 import java.util.logging.Logger;
 
-@Route(value="", layout = MainLayout.class)
-@PageTitle("Students | Student Info")
+/*This class represents the view for managing students.
+  It includes a grid for displaying student information,
+  a filter for searching students by name, and a form for adding/editing student details.
+*/
+@Route(value = "", layout = MainLayout.class)
+@PageTitle("Students | SMS")
 public class StudentView extends VerticalLayout {
 
+    // Logger for logging events
     private static final Logger LOGGER = Logger.getLogger(StudentView.class.getName());
 
+    // Grid to display student information
     Grid<Student> grid = new Grid<>(Student.class);
+
+    // TextField for filtering students by name
     TextField filterText = new TextField();
+
+    // Form for adding/editing student details
     StudentForm form;
+
+    // Service for interacting with student data
     StudentService service;
 
+    // Constructor
     public StudentView(StudentService service) {
         this.service = service;
-        addClassName("list-view");
-        setSizeFull();
+
+        // Set up the layout
+        addClassName("list-view"); // Add CSS class to the layout
+        setSizeFull(); // Set the layout size to full
+
+        // Configure grid and form
         configureGrid();
         configureForm();
 
-	filterText.setSuffixComponent(new Icon(VaadinIcon.SEARCH));
+        // Configure the filter text field
+        filterText.setSuffixComponent(new Icon(VaadinIcon.SEARCH)); // Add search icon to the text field
 
-        add(getToolbar(), getContent());
-        updateList();
-        closeEditor();
+        // Add components to the layout
+        add(getToolbar(), getContent()); // Add toolbar and content to the layout
+        updateList(); // Update the grid with student data
+        closeEditor(); // Close the editor form
     }
 
+    // Method to get the content layout
     private Component getContent() {
-        HorizontalLayout content = new HorizontalLayout(grid, form);
-        content.setFlexGrow(2, grid);
-        content.setFlexGrow(1, form);
-        content.addClassNames("content");
-        content.setSizeFull();
-        return content;
+        HorizontalLayout content = new HorizontalLayout(grid, form); // Create a horizontal layout with grid and form
+        content.setFlexGrow(2, grid); // Set grid to grow twice as much as the form
+        content.setFlexGrow(1, form); // Set form to grow
+        content.addClassNames("content"); // Add CSS class to the layout
+        content.setSizeFull(); // Set the layout size to full
+        return content; // Return the content layout
     }
 
+    // Method to configure the student form
     private void configureForm() {
-        form = new StudentForm(service.findAllCourses());
-        form.setWidth("25em");
+        form = new StudentForm(service.findAllCourses()); // Create a new student form with all courses
+        form.setWidth("25em"); // Set the width of the form
+        // Add listeners for save, delete, and close events
         form.addSaveListener(this::saveStudent);
         form.addDeleteListener(this::deleteStudent);
         form.addCloseListener(e -> closeEditor());
     }
 
+    // Method to handle saving student
     private void saveStudent(StudentForm.SaveEvent event) {
-        service.saveStudent(event.getStudent());
-        updateList();
-        closeEditor();
+        service.saveStudent(event.getStudent()); // Save the student using the service
+        updateList(); // Update the grid with student data
+        closeEditor(); // Close the editor form
     }
 
+    // Method to handle deleting student
     private void deleteStudent(StudentForm.DeleteEvent event) {
-        service.deleteStudent(event.getStudent());
-        updateList();
-        closeEditor();
+        service.deleteStudent(event.getStudent()); // Delete the student using the service
+        updateList(); // Update the grid with student data
+        closeEditor(); // Close the editor form
     }
 
+    // Method to configure the grid
     private void configureGrid() {
-        grid.addClassNames("contact-grid");
-        grid.setSizeFull();
-        grid.setColumns("studentNumber", "firstName", "lastName","gender", "email");
-	grid.addColumn(student -> student.getCourse().getName()).setHeader("Program");
-        grid.getColumns().forEach(col -> col.setAutoWidth(true));
+        grid.addClassNames("contact-grid"); // Add CSS class to the grid
+        grid.setSizeFull(); // Set the grid size to full
+        // Set columns to display in the grid
+        grid.setColumns("studentNumber", "firstName", "lastName", "gender", "email");
+        // Add a column to display the program name
+        grid.addColumn(student -> student.getCourse().getName()).setHeader("Program");
+        grid.getColumns().forEach(col -> col.setAutoWidth(true)); // Set columns to auto width
 
+        // Listener for selecting a student in the grid to edit
         grid.asSingleSelect().addValueChangeListener(event ->
-            editStudent(event.getValue()));
+                editStudent(event.getValue())); // Edit the selected student
     }
 
+    // Method to get the toolbar layout
     private HorizontalLayout getToolbar() {
-        filterText.setPlaceholder("Search by name...");
-	filterText.addClassName("filter-field");
-        filterText.setClearButtonVisible(true);
-        filterText.setValueChangeMode(ValueChangeMode.LAZY);
-        filterText.addValueChangeListener(e -> updateList());
+        // Set up filter text field
+        filterText.setPlaceholder("Search by name..."); // Set placeholder text
+        filterText.addClassName("filter-field"); // Add CSS class to the text field
+        filterText.setClearButtonVisible(true); // Show clear button
+        filterText.setValueChangeMode(ValueChangeMode.LAZY); // Set value change mode to lazy
+        filterText.addValueChangeListener(e -> updateList()); // Update grid on value change
 
-        Button addStudentButton = new Button("Add Student", new Icon(VaadinIcon.PLUS));
-        addStudentButton.addClickListener(click -> addStudent());
-	addStudentButton.addClassName("addstudent-button");
+        // Button to add a new student
+        Button addStudentButton = new Button("Add Student", new Icon(VaadinIcon.PLUS)); // Create a button with plus icon
+        addStudentButton.addClickListener(click -> addStudent()); // Add listener to handle adding a student
+        addStudentButton.addClassName("addstudent-button"); // Add CSS class to the button
 
-        var toolbar = new HorizontalLayout(filterText, addStudentButton);
-        toolbar.addClassName("toolbar");
-        return toolbar;
+        // Horizontal layout for the toolbar
+        HorizontalLayout toolbar = new HorizontalLayout(filterText, addStudentButton);
+        toolbar.addClassName("toolbar"); // Add CSS class to the layout
+        return toolbar; // Return the toolbar layout
     }
 
-    public void editStudent(Student student){
-
+    // Method to edit a student
+    public void editStudent(Student student) {
         if (student == null) {
-	    LOGGER.warning("Student object is null in editStudent method!");
-            closeEditor();
+            closeEditor(); // Close the editor if student is null
         } else {
-	    LOGGER.info("Editing student: " + student.getFirstName() + " " + student.getLastName());
-            form.setStudent(student);
-            form.setVisible(true);
-            addClassName("editing");
+            LOGGER.info("Editing student: " + student.getFirstName() + " " + student.getLastName());
+            form.setStudent(student); // Set the student in the form
+            form.setVisible(true); // Show the form
+            addClassName("editing"); // Add CSS class to indicate editing mode
         }
     }
 
+    // Method to close the editor
     private void closeEditor() {
-        form.setStudent(null);
-        form.setVisible(false);
-        removeClassName("editing");
+        form.setStudent(null); // Set form student to null
+        form.setVisible(false); // Hide the form
+        removeClassName("editing"); // Remove CSS class indicating editing mode
     }
 
+    // Method to add a new student
     private void addStudent() {
-        grid.asSingleSelect().clear();
-        editStudent(new Student());
+        grid.asSingleSelect().clear(); // Clear selection in the grid
+        editStudent(new Student()); // Edit a new student
     }
 
-
+    // Method to update the grid with filtered students
     private void updateList() {
-        grid.setItems(service.findAllStudents(filterText.getValue()));
+        grid.setItems(service.findAllStudents(filterText.getValue())); // Update grid with filtered students
     }
 }

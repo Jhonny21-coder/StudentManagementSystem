@@ -4,6 +4,48 @@
     display: none;
   }
 }
+
+vaadin-button.view-button {
+  margin-top: 8px;
+  font-family: serif;
+  background: blue;
+  color: white;
+  border-radius: 10px;
+}
+
+.grade-header {
+  margin-right: 300px;
+  font-size: 30px;
+  font-family: serif;
+  color: white;
+}
+
+vaadin-button.grade-close-button {
+  cursor: pointer;
+  margin-top: 8px;
+  margin-left: 20px;
+  cursor: pointer;
+  background: red;
+  color: white;
+  border-radius: 10px;
+  font-family: serif;
+}
+
+vaadin-text-field.field::part(input-field) {
+  color: white;
+  border-radius: 10px;
+}
+
+vaadin-text-field.field::part(label){
+  color: white;
+}
+
+vaadin-confirm-dialog-overlay.grades-dialog::part(header){
+  color: white;
+  justify-content: center;
+  align-items: center;
+}
+
 vaadin-grid.contact-grid::part(header-cell){
   color: white;
   font-family: serif;

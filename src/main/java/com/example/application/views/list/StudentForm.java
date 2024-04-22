@@ -28,131 +28,146 @@ import com.vaadin.flow.router.PageTitle;
 import java.util.List;
 import java.util.logging.Logger;
 
-@PageTitle("StudentForm | TAG")
+// The student form layout for adding, editing, and deleting student information
+@PageTitle("StudentForm | SMS")
 public class StudentForm extends FormLayout {
 
-  private static final Logger LOGGER = Logger.getLogger(StudentView.class.getName());
+    // Logger for logging events
+    private static final Logger LOGGER = Logger.getLogger(StudentView.class.getName());
 
-  TextField firstName = new TextField("First name");
-  TextField lastName = new TextField("Last name");
-  TextField age = new TextField("Age");
-  ComboBox<StudentCourse> course = new ComboBox<>("Program");
-  ComboBox<String> gender = new ComboBox<>("Gender");
-  EmailField email = new EmailField("Email");
-  TextField studentNumber = new TextField("Student Number");
+    // Form fields
+    TextField firstName = new TextField("First name"); // Text field for entering first name
+    TextField lastName = new TextField("Last name"); // Text field for entering last name
+    TextField age = new TextField("Age"); // Text field for entering age
+    ComboBox<StudentCourse> course = new ComboBox<>("Program"); // ComboBox for selecting student program
+    ComboBox<String> gender = new ComboBox<>("Gender"); // ComboBox for selecting student gender
+    EmailField email = new EmailField("Email"); // Email field for entering student email
+    TextField studentNumber = new TextField("Student Number"); // Text field for entering student number
 
-  Button save = new Button("SAVE");
-  Button delete = new Button("DELETE");
-  Button close = new Button("CLOSE");
+    // Buttons
+    Button save = new Button("SAVE"); // Button for saving student data
+    Button delete = new Button("DELETE"); // Button for deleting student data
+    Button close = new Button("CLOSE"); // Button for closing the form
 
-  BeanValidationBinder<Student> binder = new BeanValidationBinder<>(Student.class);
+    // Binder for binding form fields to the Student class
+    BeanValidationBinder<Student> binder = new BeanValidationBinder<>(Student.class);
 
-  public StudentForm(List<StudentCourse> courses) {
-    addClassName("student-form");
-    binder.bindInstanceFields(this);
+    // Constructor
+    public StudentForm(List<StudentCourse> courses) {
+        // Add CSS class to the form layout
+        addClassName("student-form");
 
-    course.setItems(courses);
-    course.setItemLabelGenerator(StudentCourse::getName);
-    course.setPlaceholder("Select Course");
-    gender.setItems("Male","Female","LGBT");
-    gender.setPlaceholder("Select Gender");
+        // Bind form fields to Student class properties
+        binder.bindInstanceFields(this);
 
-    add(firstName,
-        lastName,
-        age,
-	course,
-        gender,
-        email,
-	studentNumber,
-        createButtonsLayout());
-  }
+        // Set items and labels for course combobox
+        course.setItems(courses); // Set courses as items in the combobox
+        course.setItemLabelGenerator(StudentCourse::getName); // Set course name as label for each item
+        course.setPlaceholder("Select Course"); // Set placeholder text for the combobox
 
-    private void validateAndSave() {
-    	if (binder.isValid()) {
-            Student student = binder.getBean();
-        	if (student != null){
-            	   fireEvent(new SaveEvent(this, student));
-            	   String firstName = student.getFirstName();
-            	   String lastName = student.getLastName();
-            	   String notificationMessage = firstName + " " + lastName + " added!";
-	    	   LOGGER.info(firstName + " " + lastName + " added!");
-	    	   Notification notification = Notification.show(notificationMessage, 3000, Position.TOP_CENTER);
-		   notification.addThemeVariants(NotificationVariant.LUMO_CONTRAST);
-		   notification.addClassNames(
-			LumoUtility.Padding.Horizontal.NONE,
-			LumoUtility.Margin.Top.NONE,
-			LumoUtility.Margin.Right.NONE,
-			LumoUtility.Margin.Left.NONE
-		   );
-        	} else {
-            	   LOGGER.warning("Student object is null in validateAndSave method!");
-		   Notification notification = Notification.show("Error saving!", 3000, Position.TOP_CENTER);
-        	}
-    	 }
+        // Set items and placeholder for gender combobox
+        gender.setItems("Male", "Female", "LGBT"); // Set gender options
+        gender.setPlaceholder("Select Gender"); // Set placeholder text for the combobox
+
+        // Add form fields and buttons to the form layout
+        add(firstName, lastName, age, course, gender, email, studentNumber, createButtonsLayout());
     }
 
-  private Component createButtonsLayout() {
-    save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-    close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+    // Method to validate form input and save student data
+    private void validateAndSave() {
+        if (binder.isValid()) { // Check if form fields are valid
+            // Get student object from binder
+            Student student = binder.getBean();
+            if (student != null) {
+                // Fire save event with the student object
+                fireEvent(new SaveEvent(this, student));
+                // Show success notification
+                String notificationMessage = student.getFirstName() + " " + student.getLastName() + " added!";
+                Notification notification = Notification.show(notificationMessage, 3000, Position.TOP_CENTER);
+                notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            } else {
+                LOGGER.warning("Student object is null in validateAndSave method!"); // Log warning if student object is null
+                // Show error notification
+                Notification notification = Notification.show("Error saving!", 3000, Position.TOP_CENTER);
+            }
+        }
+    }
 
-    save.addClickShortcut(Key.ENTER);
-    close.addClickShortcut(Key.ESCAPE);
+    // Method to create the layout for buttons
+    private Component createButtonsLayout() {
+        // Set theme variants for buttons
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY); // Set primary theme for save button
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR); // Set error theme for delete button
+        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY); // Set tertiary theme for close button
 
-    save.addClickListener(event -> validateAndSave());
-    delete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean())));
-    close.addClickListener(event -> fireEvent(new CloseEvent(this)));
+        // Add click shortcuts for buttons
+        save.addClickShortcut(Key.ENTER); // Add Enter key shortcut for save button
+        close.addClickShortcut(Key.ESCAPE); // Add Escape key shortcut for close button
 
-    binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+        // Add click listeners for buttons
+        save.addClickListener(event -> validateAndSave()); // Validate and save data when save button is clicked
+        delete.addClickListener(event -> fireEvent(new DeleteEvent(this, binder.getBean()))); // Fire delete event when delete button is clicked
+        close.addClickListener(event -> fireEvent(new CloseEvent(this))); // Fire close event when close button is clicked
 
-    return new HorizontalLayout(save, delete, close);
-  }
+        // Enable save button based on binder's validation status
+        binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
 
-  public void setStudent(Student student) {
-        binder.setBean(student);
-  }
+        // Return a horizontal layout with buttons
+        return new HorizontalLayout(save, delete, close);
+    }
 
-   //ABSTRACT
-  public static abstract class StudentFormEvent extends ComponentEvent<StudentForm> {
+    // Method to set the student data in the form
+    public void setStudent(Student student) {
+        binder.setBean(student); // Set student data to the binder
+    }
+
+    // Abstract class for events related to the student form
+    public static abstract class StudentFormEvent extends ComponentEvent<StudentForm> {
         private Student student;
 
-  	protected StudentFormEvent(StudentForm source, Student student) {
-        	super(source, false);
-        	this.student = student;
-  	}
+        protected StudentFormEvent(StudentForm source, Student student) {
+            super(source, false);
+            this.student = student;
+        }
 
-  	public Student getStudent() {
-        	return student;
-  	}
-  }
+        public Student getStudent() {
+            return student;
+        }
+    }
 
-  public static class SaveEvent extends StudentFormEvent {
+    // Event class for saving student data
+    public static class SaveEvent extends StudentFormEvent {
         SaveEvent(StudentForm source, Student student) {
-        	super(source, student);
-  	}
-  }
+            super(source, student);
+        }
+    }
 
-  public static class DeleteEvent extends StudentFormEvent {
+    // Event class for deleting student data
+    public static class DeleteEvent extends StudentFormEvent {
         DeleteEvent(StudentForm source, Student student) {
-        	super(source, student);
-  	}
-  }
+            super(source, student);
+        }
+    }
 
-  public static class CloseEvent extends StudentFormEvent {
+    // Event class for closing the form
+    public static class CloseEvent extends StudentFormEvent {
         CloseEvent(StudentForm source) {
-        	super(source, null);
-  	}
-  }
+            super(source, null);
+        }
+    }
 
-  public Registration addDeleteListener(ComponentEventListener<DeleteEvent> listener) {
-        return addListener(DeleteEvent.class, listener);
-  }
+    // Method to add a listener for the delete event
+    public Registration addDeleteListener(ComponentEventListener<DeleteEvent> listener) {
+        return addListener(DeleteEvent.class, listener); // Add listener for delete event
+    }
 
-  public Registration addSaveListener(ComponentEventListener<SaveEvent> listener) {
-        return addListener(SaveEvent.class, listener);
-  }
+    // Method to add a listener for the save event
+    public Registration addSaveListener(ComponentEventListener<SaveEvent> listener) {
+        return addListener(SaveEvent.class, listener); // Add listener for save event
+    }
 
-  public Registration addCloseListener(ComponentEventListener<CloseEvent> listener) {
-        return addListener(CloseEvent.class, listener);
-  }
+    // Method to add a listener for the close event
+    public Registration addCloseListener(ComponentEventListener<CloseEvent> listener) {
+        return addListener(CloseEvent.class, listener); // Add listener for close event
+    }
 }

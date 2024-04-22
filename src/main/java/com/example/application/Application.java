@@ -8,17 +8,17 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 
-@SpringBootApplication(exclude = {SecurityAutoConfiguration.class})
-@Theme(value = "managementflow", variant = Lumo.DARK)
+@SpringBootApplication(exclude = {SecurityAutoConfiguration.class}) // Annotation to declare the class as a Spring Boot application and exclude Spring Security auto-configuration
+@Theme(value = "managementflow", variant = Lumo.DARK) // Annotation to define the Vaadin theme for the application
 @PWA(
-        name = "Student Management System",
-        shortName = "SMS",
-        offlinePath="offline.html",
-        offlineResources = { "images/offline.png" }
+     name = "Student Management System", // Name of the Progressive Web Application
+     shortName = "SMS", // Short name of the application
+     offlinePath="offline.html", // Path to the HTML file to be displayed when the application is offline
+     offlineResources = { "images/offline.png" } // Resources to be cached and used when the application is offline
 )
-public class Application implements AppShellConfigurator {
+public class Application implements AppShellConfigurator { // Main class of the application implementing AppShellConfigurator interface
 
-    public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+    public static void main(String[] args) { // Main method
+        SpringApplication.run(Application.class, args); // Start the Spring Boot application
     }
 }

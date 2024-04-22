@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 
+// JpaRepository interface provided by Spring Data JPA for CRUD operations on Attendance entities
 public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
-   //List<Attendance> findByAbsentStudentIdsIn(Long studentId);
+
 }
