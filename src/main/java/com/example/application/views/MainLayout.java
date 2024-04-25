@@ -87,3 +87,4 @@ public class MainLayout extends AppLayout {
         addToDrawer(drawerLayout); // Add the drawer to the side drawer
     }
 }
+
