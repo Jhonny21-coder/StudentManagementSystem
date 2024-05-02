@@ -1,5 +1,6 @@
 package com.example.application.views;
 
+import com.example.application.security.SecurityService;
 import com.example.application.views.list.StudentView;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -18,8 +19,12 @@ import com.vaadin.flow.component.avatar.Avatar;
 // Main layout of the project's view, including header, footer, and drawer
 public class MainLayout extends AppLayout {
 
+    private final SecurityService securityService;
+
     // Constructor for initializing the layout
-    public MainLayout() {
+    public MainLayout(SecurityService securityService) {
+    	this.securityService = securityService;
+
         // Apply a CSS class to the layout
         addClassName("main-layout");
 
@@ -80,8 +85,12 @@ public class MainLayout extends AppLayout {
         image.setImage("./icons/icon.png"); // Set the image for the logo
         image.addClassName("image"); // Add CSS class for styling
 
+	String username = securityService.getAuthenticatedUser().getUsername();
+	Button logout = new Button("Log out", new Icon(VaadinIcon.SIGN_OUT), e -> securityService.logout());
+	logout.addClassName("logout");
+
         // Arrange components vertically for the drawer
-        VerticalLayout drawerLayout = new VerticalLayout(image, student, attendance, grades); // Create a vertical layout for the drawer
+        VerticalLayout drawerLayout = new VerticalLayout(image, student, attendance, grades, logout); // Create a vertical layout for the drawer
 
         // Add the drawer to the layout
         addToDrawer(drawerLayout); // Add the drawer to the side drawer

@@ -4,6 +4,25 @@
     display: none;
   }
 }
+vaadin-icon.edit-icon {
+  cursor: pointer;
+}
+
+vaadin-button.logout > vaadin-icon {
+  color: white;
+  height: 43px;
+  width: 43px;
+  margin-right: 10px;
+  margin-left: 0;
+}
+
+vaadin-button.logout {
+  background: transparent;
+  font-size: 20px;
+  margin-right: 80px;
+  font-family: serif;
+  curson: pointer;
+}
 
 vaadin-button.view-button {
   margin-top: 8px;
@@ -11,6 +30,7 @@ vaadin-button.view-button {
   background: blue;
   color: white;
   border-radius: 10px;
+  cursor: pointer;
 }
 
 .grade-header {

@@ -13,6 +13,7 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.component.icon.*;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.logging.Logger;
 
@@ -20,6 +21,8 @@ import java.util.logging.Logger;
   It includes a grid for displaying student information,
   a filter for searching students by name, and a form for adding/editing student details.
 */
+
+@PermitAll
 @Route(value = "", layout = MainLayout.class)
 @PageTitle("Students | SMS")
 public class StudentView extends VerticalLayout {
@@ -134,7 +137,7 @@ public class StudentView extends VerticalLayout {
         if (student == null) {
             closeEditor(); // Close the editor if student is null
         } else {
-            LOGGER.info("Editing student: " + student.getFirstName() + " " + student.getLastName());
+            System.out.println("EDITING STUDENT: " + student.getFullName());
             form.setStudent(student); // Set the student in the form
             form.setVisible(true); // Show the form
             addClassName("editing"); // Add CSS class to indicate editing mode

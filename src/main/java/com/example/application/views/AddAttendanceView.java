@@ -27,6 +27,7 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.router.PageTitle;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.List;
 import java.util.Collections;
@@ -36,6 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 
+@PermitAll
 // Route and title
 @Route("addAttendance") // Route for accessing the view
 @PageTitle("AddAttendance | SMS") // Title of the page
@@ -119,11 +121,12 @@ public class AddAttendanceView extends AppLayout {
 
             checkbox.setValue(student.getStatus()); // Set checkbox value
             checkbox.addValueChangeListener(event -> {
-                boolean newStatus = event.getValue(); // Get new status from checkbox value change
+            	boolean newStatus = event.getValue(); // Get new status from checkbox value change
 
-                student.setStatus(newStatus); // Update student status
+            	student.setStatus(newStatus); // Update student status
                 studentService.saveStudent(student); // Save student
 
+		System.out.println("SET AS ABSENT: " + student.getFullName());
                 // Update the badge color live
                 grid.getDataProvider().refreshItem(student); // Refresh grid
             });

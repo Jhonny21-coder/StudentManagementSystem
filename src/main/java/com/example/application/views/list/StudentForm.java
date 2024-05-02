@@ -24,16 +24,14 @@ import com.vaadin.flow.theme.lumo.LumoUtility;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.router.PageTitle;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.List;
-import java.util.logging.Logger;
 
+@PermitAll
 // The student form layout for adding, editing, and deleting student information
 @PageTitle("StudentForm | SMS")
 public class StudentForm extends FormLayout {
-
-    // Logger for logging events
-    private static final Logger LOGGER = Logger.getLogger(StudentView.class.getName());
 
     // Form fields
     TextField firstName = new TextField("First name"); // Text field for entering first name
@@ -86,7 +84,6 @@ public class StudentForm extends FormLayout {
                 Notification notification = Notification.show(notificationMessage, 3000, Position.TOP_CENTER);
                 notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             } else {
-                LOGGER.warning("Student object is null in validateAndSave method!"); // Log warning if student object is null
                 // Show error notification
                 Notification notification = Notification.show("Error saving!", 3000, Position.TOP_CENTER);
             }

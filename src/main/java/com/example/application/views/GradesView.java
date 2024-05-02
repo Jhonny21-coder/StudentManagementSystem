@@ -31,11 +31,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.router.PageTitle;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ArrayList;
 
+@PermitAll
 // Route and title
 @Route("grades") // Route for accessing the view
 @PageTitle("Grades | SMS") // Title of the page
@@ -88,6 +90,8 @@ public class GradesView extends AppLayout {
 
         // Creating a grid to display student data
         Grid<Student> grid = new Grid<>(Student.class, false); // Grid for displaying student data
+        //<theme-editor-local-classname>
+        grid.addClassName("grades-view-grid-1");
         grid.setSizeFull(); // Set grid size to full
         grid.addClassName("grid"); // Add CSS class to the grid
 
@@ -116,8 +120,12 @@ public class GradesView extends AppLayout {
             Icon editIcon = new Icon(VaadinIcon.PENCIL); // Icon for editing grade
             editIcon.addClickListener(event -> {
                 createGradesForm(student, grid); // Action to create grade form
+
+                System.out.println("EDITING GRADES FOR: " + student.getFullName());
             });
+            editIcon.addClassName("edit-icon");
             return editIcon; // Return edit icon
+
         }).setHeader("Edit Grade"); // Set header for the column
 
         // Sorting students by last name
@@ -269,6 +277,8 @@ public class GradesView extends AppLayout {
 
 	    // Save updated grades to database
             studentService.saveStudent(student);
+
+	    System.out.println("UPDATED GRADES FOR: " + student.getFullName());
             // Refresh the grid
             grid.getDataProvider().refreshItem(student);
 

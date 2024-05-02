@@ -29,11 +29,13 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.icon.*;
 import com.vaadin.flow.router.PageTitle;
+import jakarta.annotation.security.PermitAll;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.ArrayList;
 
+@PermitAll
 // Route and title
 @Route("attendance") // Route for accessing the view
 @PageTitle("Attendance | SMS") // Title of the page
